@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Muthink.MockHealth", "Source\MockHealth\Muthink.MockHealth.csproj", "{11CA24C1-4506-4D9C-8FE1-162C1BBCDA58}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{4BA2FEAC-3A83-4E99-9190-1975AFC54FAA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockHealthTests", "Source\MockHealthTests\MockHealthTests.csproj", "{5C5896C0-37FE-419B-B43A-F74CC7BB1DBA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Muthink.MockHealth.FHIR.R4", "Source\MockHealth.FHIR.R4\Muthink.MockHealth.FHIR.R4.csproj", "{BC76A27F-F8AB-4500-8F3D-FA9FAEEEC8D9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{11CA24C1-4506-4D9C-8FE1-162C1BBCDA58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11CA24C1-4506-4D9C-8FE1-162C1BBCDA58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11CA24C1-4506-4D9C-8FE1-162C1BBCDA58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11CA24C1-4506-4D9C-8FE1-162C1BBCDA58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C5896C0-37FE-419B-B43A-F74CC7BB1DBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C5896C0-37FE-419B-B43A-F74CC7BB1DBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C5896C0-37FE-419B-B43A-F74CC7BB1DBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C5896C0-37FE-419B-B43A-F74CC7BB1DBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC76A27F-F8AB-4500-8F3D-FA9FAEEEC8D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC76A27F-F8AB-4500-8F3D-FA9FAEEEC8D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC76A27F-F8AB-4500-8F3D-FA9FAEEEC8D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC76A27F-F8AB-4500-8F3D-FA9FAEEEC8D9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
