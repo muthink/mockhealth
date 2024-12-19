@@ -7,34 +7,41 @@ Copyright © 2024 JC Stevens
 
    THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
+using Muthink.MockHealth;
 
-using Hl7.Fhir.Model;
+namespace MockHealthTests;
 
-namespace Muthink.MockHealth.FHIR.R4.Internal;
-
-public class MockFHIRGeneratorBase
+public class MockBaseTests
 {
-    protected MockString Mocker;
+    [Fact]
+    public void NameTests()
+    {
+        var fullName = MockString.New(473).LastName().Comma(true)
+            .FirstName().Space().MiddleName();
+        Assert.Equal("Harris, Rowen Paul", fullName);
 
-    protected MockFHIRGeneratorBase(int seed = 0, TimeProvider? timeProvider = null)
-        => Mocker = new MockString(new Random(seed), timeProvider);
+        var city = MockString.New(234).City();
+        Assert.Equal("Gainesville", city);
 
-    public Address GenerateAddress() =>
-        new()
-        {
-            City = Mocker.City(),
-            Country = "USA",
-            State = Mocker.USState(),
-            Line = new[] { Mocker.Integer(1, 999).Space().Street().StreetType().ToString() },
-            Type = Address.AddressType.Physical,
-            Use = Address.AddressUse.Home
-        };
+        var state = MockString.New(665).USState();
+        Assert.Equal("Montana", state);
+    }
 
-    public HumanName GenerateHumanName() =>
-        new()
-        {
-            Family = Mocker.LastName(),
-            Given = new string[] { Mocker.FirstName(), Mocker.MiddleName() },
-            Use = HumanName.NameUse.Official
-        };
+    [Fact]
+    public void DateTests()
+    {
+        var timeProvider =
+            new MockTimeProvider(new DateTimeOffset(2024, 12, 18, 12, 0, 0, TimeZoneInfo.Local.BaseUtcOffset));
+
+        var mock = new MockBase(2399, timeProvider);
+
+        var birthDate = mock.BirthDate(1, 100);
+
+        Assert.Equal(new DateOnly(1926,6,3), birthDate);
+
+        var time = mock.Next(TimeSpan.FromHours(8), TimeSpan.FromHours(18));
+
+        Assert.Equal(new TimeSpan(17,16,51),
+            new TimeSpan(time.Hours,time.Minutes,time.Seconds));
+    }
 }

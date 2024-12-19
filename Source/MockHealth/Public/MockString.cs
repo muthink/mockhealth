@@ -9,10 +9,14 @@ Copyright © 2024 JC Stevens
 */
 
 using System.Globalization;
+using System.Text;
 
 namespace Muthink.MockHealth;
 
-public class MockString
+/// <summary>
+///     Builds a string.
+/// </summary>
+public class MockString : MockBase
 {
     /// <summary>
     ///     Array of top 100 common city names - AI generated
@@ -39,19 +43,16 @@ public class MockString
     /// </summary>
     private static readonly string[] _firstNames =
     [
-        "James", "Mary", "Robert", "Patricia", "John", "Jennifer", "Michael", "Linda",
-        "William", "Elizabeth", "David", "Barbara", "Richard", "Susan", "Joseph", "Jessica",
-        "Thomas", "Sarah", "Charles", "Karen", "Christopher", "Nancy", "Daniel", "Lisa",
-        "Matthew", "Margaret", "Anthony", "Betty", "Mark", "Sandra", "Donald", "Ashley",
-        "Steven", "Dorothy", "Paul", "Kimberly", "Andrew", "Emily", "Joshua", "Donna",
-        "Kenneth", "Michelle", "Kevin", "Carol", "Brian", "Amanda", "George", "Melissa",
-        "Edward", "Deborah", "Ronald", "Stephanie", "Timothy", "Rebecca", "Jason", "Sharon",
-        "Jeffrey", "Laura", "Ryan", "Cynthia", "Jacob", "Kathleen", "Gary", "Amy",
-        "Nicholas", "Shirley", "Eric", "Angela", "Jonathan", "Helen", "Stephen", "Anna",
-        "Larry", "Brenda", "Justin", "Pamela", "Scott", "Nicole", "Brandon", "Emma",
-        "Frank", "Samantha", "Benjamin", "Katherine", "Gregory", "Christine", "Samuel", "Debra",
-        "Raymond", "Rachel", "Patrick", "Catherine", "Alexander", "Carolyn", "Jack", "Janet",
-        "Dennis", "Ruth", "Jerry", "Maria", "Tyler", "Heather"
+        "Alex", "Jordan", "Taylor", "Morgan", "Casey", "Riley", "Dakota", "Skyler", "Avery", "Jamie",
+        "Cameron", "Reese", "Quinn", "Rowan", "Parker", "Emerson", "Sage", "Drew", "Hayden", "Finley",
+        "Kendall", "Logan", "Peyton", "Blake", "Charlie", "Harley", "Jayden", "Micah", "Arden", "Kai",
+        "Sawyer", "Tatum", "River", "Shiloh", "Aubrey", "Bailey", "Dylan", "Elliott", "Gray", "Jesse",
+        "Lennon", "Marley", "Monroe", "Phoenix", "Reagan", "Rowen", "Sam", "Sasha", "Sidney", "Terry",
+        "Tristan", "Wren", "Ashton", "Bellamy", "Blair", "Brook", "Campbell", "Chandler", "Dallas", "Eden",
+        "Ellis", "Frankie", "Harlow", "Haven", "Justice", "Karsen", "Keegan", "Lane", "Linden", "Marlowe",
+        "Oakley", "Palmer", "Paris", "Reagan", "Remy", "Robin", "Rory", "Ryan", "Spencer", "Sterling",
+        "Sunny", "Teagan", "Toby", "Val", "Winter", "Arlo", "Brett", "Cory", "Darcy", "Devin", "Erin",
+        "Kelsey", "Kim", "Leslie", "Pat", "Reed", "Shea", "Shane", "Terry", "West", "Zion"
     ];
 
     /// <summary>
@@ -72,6 +73,21 @@ public class MockString
         "Watson", "Brooks", "Chavez", "Wood", "James", "Bennett", "Gray", "Mendoza",
         "Ruiz", "Hughes", "Price", "Alvarez", "Castillo", "Sanders", "Patel", "Myers",
         "Long", "Ross", "Foster", "Jimenez"
+    ];
+
+
+    /// <summary>
+    ///     Array of street abbreviation types - AI generated
+    /// </summary>
+    private static readonly string[] _loremIpsum =
+    [
+        "lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing", "elit", "sed", "do",
+        @"eiusmod", @"tempor", @"incididunt", "ut", @"labore", "et", @"dolore", "magna", @"aliqua", "ut",
+        @"enim", "ad", "minim", @"veniam", @"quis", @"nostrud", @"exercitation", @"ullamco", @"laboris", @"nisi",
+        "ut", @"aliquip", "ex", "ea", @"commodo", @"consequat", @"duis", @"aute", @"irure", "dolor",
+        "in", @"reprehenderit", "in", @"voluptate", @"velit", @"esse", @"cillum", @"dolore", "eu", @"fugiat",
+        @"nulla", @"pariatur", @"excepteur", @"sint", @"occaecat", @"cupidatat", "non", @"proident", "sunt", "in",
+        @"culpa", "qui", @"officia", @"deserunt", @"mollit", "anim", "id", "est", @"laborum"
     ];
 
     /// <summary>
@@ -146,29 +162,29 @@ public class MockString
         "West Virginia", "Wisconsin", "Wyoming"
     ];
 
-    private readonly Random _random;
-    private readonly string _value;
+    private readonly StringBuilder _value;
 
-    public MockString(int seed)
+    public MockString(Random random, TimeProvider? timeProvider = null) : base(random, timeProvider) =>
+        _value = new StringBuilder();
+
+    /// <summary>
+    ///     Creates a MockString, appending a value.
+    /// </summary>
+    /// <param name="mockString">The left side for this call.</param>
+    /// <param name="value">Append this value</param>
+    public MockString(MockString mockString, string value) : base(mockString.Rand, mockString.TimeProvider)
     {
-        Seed = seed;
-        _random = new Random(seed);
-        _value = string.Empty;
+        _value = mockString._value;
+        _value.Append(value);
     }
 
-    public MockString(MockString mockString, string value)
-    {
-        Seed = mockString._random.Next();
-        _random = mockString._random;
-        if( mockString._value.Length == 0 )
-        {
-            _value = value;
-        }
-        else
-        {
-            _value += value;
-        }
-    }
+    /// <summary>
+    ///     Generates the first line of a street address
+    /// </summary>
+    /// <param name="isStreetTypeAbbreviated">If true, then the street type is abbreviated</param>
+    /// <returns></returns>
+    public MockString AddressLine(bool isStreetTypeAbbreviated = false)
+        => Append($"{Integer(1, 9999)} {Street()} {StreetType(isStreetTypeAbbreviated)})");
 
     /// <summary>Appends a string value</summary>
     /// <param name="value"></param>
@@ -178,12 +194,12 @@ public class MockString
     public MockString Append(string[] choices)
     {
         // Deterministically calculate the index from the seed
-        var index = Math.Abs(Seed % choices.Length);
+        var index = Math.Abs(Rand.Next() % choices.Length);
 
         // Return the selected name
         var name = choices[index];
 
-        return new MockString(this, name);
+        return Append(name);
     }
 
     /// <summary>
@@ -194,8 +210,9 @@ public class MockString
 
 
     /// <summary>Appends a space</summary>
-    /// <returns></returns>
-    public MockString Comma() => Append(" ");
+    /// <param name="hasSpace">If true, append a space after the comma.</param>
+    /// <returns>Appends the comma and optional space</returns>
+    public MockString Comma(bool hasSpace = false) => hasSpace ? Append(", ") : Append(",");
 
     /// <summary>
     ///     Formats a date, between a given range
@@ -206,10 +223,22 @@ public class MockString
     /// <returns>Date, in the <paramref name="format" /></returns>
     public MockString Date(DateTime first, DateTime last, string format = "yyyy-MM-dd")
     {
-        var lastTicks = Math.Max(first.Ticks, last.Ticks);
-        var firstTicks = Math.Min(first.Ticks, last.Ticks);
-        var ticks = _random.NextInt64(firstTicks, lastTicks);
-        var dateTime = new DateTime(ticks);
+        var dateTime = Next(first, last);
+        return Append(dateTime.ToString(format, CultureInfo.InvariantCulture));
+    }
+
+    /// <summary>
+    ///     Generates a formatted that is between the <paramref name="oldest" /> and <paramref name="newest" /> dates.
+    /// </summary>
+    /// <param name="oldest">Oldest date, subtracted from the current date time</param>
+    /// <param name="newest"></param>
+    /// <param name="format"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    public MockString Date(TimeSpan oldest, TimeSpan newest, string format = "yyyy-MM-dd")
+    {
+        var timeSpan = new TimeSpan(NextInt64(newest.Ticks, oldest.Ticks));
+        var dateTime = Now - timeSpan;
         return Append(dateTime.ToString(format, CultureInfo.InvariantCulture));
     }
 
@@ -218,6 +247,41 @@ public class MockString
     /// </summary>
     /// <returns>The first name</returns>
     public MockString FirstName() => Append(_firstNames);
+
+    public string GenerateLoremIpsumSentence(int seed, int minWords, int maxWords)
+    {
+        // Determine the number of words in the sentence
+        var wordCount = Next(minWords, maxWords + 1);
+
+        // Build the sentence
+        var sentence = new StringBuilder();
+        for(var i = 0; i < wordCount; i++)
+        {
+            // Select a random word
+            var word = _loremIpsum[Rand.Next(_loremIpsum.Length)];
+
+            // Capitalize the first word of the sentence
+            if( i == 0 )
+            {
+                word = char.ToUpper(word[0]) + word[1..];
+            }
+
+            // Append the word to the sentence
+            sentence.Append(word);
+
+            // Add a space after each word except the last
+            if( i < wordCount - 1 )
+            {
+                sentence.Append(" ");
+            }
+        }
+
+        // Add a period at the end
+        sentence.Append(".");
+
+        // Return the generated sentence
+        return sentence.ToString();
+    }
 
     /// <summary>
     ///     Creates a string, which contains a random value.
@@ -228,7 +292,7 @@ public class MockString
     /// <returns>Appended, formatted integer</returns>
     public MockString Integer(int min, int max, int padding = -1)
     {
-        var value = _random.Next(min, max).ToString(CultureInfo.InvariantCulture);
+        var value = Rand.Next(min, max).ToString(CultureInfo.InvariantCulture);
 
         return Append(padding <= 0 ? value : value.PadLeft(padding, '0'));
     }
@@ -242,7 +306,7 @@ public class MockString
     /// <returns></returns>
     public MockString Integer(long min, long max, int padding = -1)
     {
-        var value = _random.NextInt64(min, max).ToString(CultureInfo.InvariantCulture);
+        var value = NextInt64(min, max).ToString(CultureInfo.InvariantCulture);
 
         return Append(padding <= 0 ? value : value.PadLeft(padding, '0'));
     }
@@ -263,21 +327,16 @@ public class MockString
     ///     Starts a new MockString
     /// </summary>
     /// <param name="seed">The seed to start with</param>
-    /// <returns></returns>
-    public static MockString New(int seed) => new(seed);
-
-    /// <summary>
-    ///     Starts a new MockString, using the seed from the previous
-    /// </summary>
-    /// <param name="mockString">The seed to start with</param>
-    /// <returns></returns>
-    public static MockString New(MockString mockString) => new(mockString.Seed);
+    /// <param name="timeProvider">The <see cref="TimeProvider" /></param>
+    /// <returns>The new <see cref="MockString" /> object</returns>
+    public static MockString New(int seed, TimeProvider? timeProvider = null)
+        => new(new Random(seed), timeProvider);
 
     /// <summary>
     ///     Allows direct assignment of the build-up data to a string.
     /// </summary>
     /// <param name="mockString">Source of string</param>
-    public static implicit operator string(MockString mockString) => mockString._value;
+    public static implicit operator string(MockString mockString) => mockString._value.ToString();
 
     /// <summary>
     ///     Generates a phone number
@@ -287,14 +346,14 @@ public class MockString
     public MockString Phone(bool noDelimiters = false)
     {
         // Generate invalid area code
-        var areaCode = _random.Next(100, 999);
+        var areaCode = Rand.Next(100, 999);
         if( areaCode is 555 )
         {
             areaCode = 554;
         }
 
         // Generate line number
-        var lineNumber = _random.Next(0, 9999); // Valid line numbers, but doesn't fix other invalid components
+        var lineNumber = Rand.Next(0, 9999); // Valid line numbers, but doesn't fix other invalid components
 
         // Format as a standard phone number
         var invalidPhoneNumber =
@@ -318,16 +377,10 @@ public class MockString
     {
         var percent = Math.Abs(percentFirst % 100);
 
-        var chance = _random.NextDouble() * 100;
+        var chance = Rand.NextDouble() * 100;
 
         return chance <= percent ? first(this) : second(this);
     }
-
-
-    /// <summary>
-    ///     Current seed value.
-    /// </summary>
-    public int Seed { get; }
 
     /// <summary>Appends a space</summary>
     /// <returns></returns>
@@ -340,17 +393,17 @@ public class MockString
     public MockString SSN()
     {
         // Generate invalid area number (000, 666, or 900-999)
-        var area = _random.Next(0, 1000);
+        var area = Rand.Next(0, 1000);
         if( area != 0 && area != 666 && area is < 900 or > 999 )
         {
-            area = _random.Next(900, 1000); // Force invalid range if valid by chance
+            area = Rand.Next(900, 1000); // Force invalid range if valid by chance
         }
 
         // Generate invalid group number (00)
-        var group = _random.Next(0, 99); // Always invalid group number
+        var group = Rand.Next(0, 99); // Always invalid group number
 
         // Generate invalid serial number (0000)
-        var serial = _random.Next(0, 9999); // Always invalid serial number
+        var serial = Rand.Next(0, 9999); // Always invalid serial number
 
         // Format the SSN with leading zeros as needed
         var invalidSSN = $"{area:000}-{group:00}-{serial:0000}";
@@ -372,7 +425,7 @@ public class MockString
     public MockString StreetType(bool isAbbreviation = false)
         => isAbbreviation ? Append(_streetAbbreviationTypes) : Append(_streetTypes);
 
-    public override string ToString() => _value;
+    public override string ToString() => _value.ToString();
 
     /// <summary>
     ///     Appends a US state.
